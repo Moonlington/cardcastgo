@@ -1,4 +1,4 @@
-package discordgo
+package cardcastgo
 
 var (
 	EndpointCardcast = "https://api.cardcastgame.com/v1/"

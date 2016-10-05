@@ -2,10 +2,11 @@ package cardcastgo
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 var ErrJSONUnmarshal = errors.New("json unmarshal")
@@ -40,10 +41,7 @@ func (s *Session) request(method, urlStr, contentType string, b []byte) (respons
 
 	resp, err := client.Do(req)
 	defer func() {
-		err2 := resp.Body.Close()
-		if err2 != nil {
-			log.Println("error closing resp body")
-		}
+		resp.Body.Close()
 	}()
 
 	response, err = ioutil.ReadAll(resp.Body)
@@ -81,7 +79,7 @@ func (s *Session) Deck(deckID string) (cd *Carddeck, err error) {
 
 func (s *Session) Calls(deckID string) (c *Card, err error) {
 
-	body, err := s.Request("GET", EndpointDeck(deckID), nil)
+	body, err := s.Request("GET", EndpointCalls(deckID), nil)
 	if err != nil {
 		return
 	}
@@ -91,9 +89,9 @@ func (s *Session) Calls(deckID string) (c *Card, err error) {
 
 }
 
-func (s *Session) Calls(deckID string) (c *Card, err error) {
+func (s *Session) Responses(deckID string) (c *Card, err error) {
 
-	body, err := s.Request("GET", EndpointDeck(deckID), nil)
+	body, err := s.Request("GET", EndpointResponses(deckID), nil)
 	if err != nil {
 		return
 	}

@@ -3,7 +3,7 @@ CardcastGo - CardCast API for Go
 
 ## Setup
 1. `go get github.com/Moonlington/cardcastgo`
-2. Use the lib бе\_(е─)_/бе
+2. Use the lib :D
 
 ## Example
 

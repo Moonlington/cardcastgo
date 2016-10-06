@@ -153,3 +153,27 @@ func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err erro
 	return
 
 }
+
+func (s *Session) DeleteCall(deckID string, callID string) (c *Card, err error) {
+
+	body, err := s.Request("DELETE", EndpointCall(deckID, callID), nil)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}
+
+func (s *Session) DeleteResponse(deckID string, respID string) (c *Card, err error) {
+
+	body, err := s.Request("DELETE", EndpointResponse(deckID, respID), nil)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}

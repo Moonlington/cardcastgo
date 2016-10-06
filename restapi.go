@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -65,7 +66,7 @@ func unmarshal(data []byte, v interface{}) error {
 // Functions specific to Decks
 // ------------------------------------------------------------------------------------------------
 
-func (s *Session) Deck(deckID string) (cd *Carddeck, err error) {
+func (s *Session) GetDeck(deckID string) (cd *Carddeck, err error) {
 
 	body, err := s.Request("GET", EndpointDeck(deckID), nil)
 	if err != nil {
@@ -77,7 +78,7 @@ func (s *Session) Deck(deckID string) (cd *Carddeck, err error) {
 
 }
 
-func (s *Session) Calls(deckID string) (c *Card, err error) {
+func (s *Session) GetCalls(deckID string) (c *Card, err error) {
 
 	body, err := s.Request("GET", EndpointCalls(deckID), nil)
 	if err != nil {
@@ -89,9 +90,55 @@ func (s *Session) Calls(deckID string) (c *Card, err error) {
 
 }
 
-func (s *Session) Responses(deckID string) (c *Card, err error) {
+func (s *Session) GetResponses(deckID string) (c *Card, err error) {
 
 	body, err := s.Request("GET", EndpointResponses(deckID), nil)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}
+
+func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
+
+	fcallStr := strings.Split(callStr, "_")
+
+	data := struct {
+		Calls struct {
+			Text   []string `json:"text"`
+			String string   `json:"string"`
+		} `json: "calls"`
+	}{}
+
+	data.Calls.Text = fcallStr
+	data.Calls.String = callStr
+
+	body, err := s.Request("POST", EndpointCalls(deckID), data)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}
+
+func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err error) {
+
+	data := struct {
+		Responses struct {
+			Text   []string `json:"text"`
+			String string   `json:"string"`
+		} `json: "responses"`
+	}{}
+
+	data.Responses.Text = append(data.Responses.Text, respStr)
+	data.Responses.String = respStr
+
+	body, err := s.Request("POST", EndpointResponses(deckID), data)
 	if err != nil {
 		return
 	}

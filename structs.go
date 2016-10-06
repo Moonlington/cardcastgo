@@ -32,6 +32,30 @@ type Card []struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Callpost struct {
+	Calls []struct {
+		Text       []string `json:"text"`
+		String     string   `json:"string"`
+		Validation struct {
+			State   string `json:"state"`
+			Message string `json:"message"`
+		} `json:"validation"`
+		EventChain interface{} `json:"eventChain"`
+	} `json:"calls"`
+}
+
+type Responsepost struct {
+	Responses []struct {
+		Text       []string `json:"text"`
+		String     string   `json:"string"`
+		Validation struct {
+			State   string `json:"state"`
+			Message string `json:"message"`
+		} `json:"validation"`
+		EventChain interface{} `json:"eventChain"`
+	} `json:"responses"`
+}
+
 // type Searchresult struct {
 // 	Total   int `json:"total"`
 // 	Results struct {

@@ -83,7 +83,7 @@ func (s *Session) GetDeck(deckID string) (cd *Carddeck, err error) {
 }
 
 // Returns a Card type object containing all calls (black cards)
-func (s *Session) GetCalls(deckID string) (c *Card, err error) {
+func (s *Session) GetCalls(deckID string) (c *[]Card, err error) {
 
 	body, err := s.Request("GET", EndpointCalls(deckID), nil)
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *Session) GetCalls(deckID string) (c *Card, err error) {
 }
 
 // Returns a Card type object containing all responses (white cards)
-func (s *Session) GetResponses(deckID string) (c *Card, err error) {
+func (s *Session) GetResponses(deckID string) (c *[]Card, err error) {
 
 	body, err := s.Request("GET", EndpointResponses(deckID), nil)
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *Session) GetResponses(deckID string) (c *Card, err error) {
 }
 
 // Posts a call to the deck (You must own the deck)
-func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
+func (s *Session) PostCall(deckID string, callStr string) (c *[]Card, err error) {
 
 	fcallStr := strings.Split(callStr, "_")
 
@@ -137,7 +137,7 @@ func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
 }
 
 // Posts a response to the deck (You must own the deck)
-func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err error) {
+func (s *Session) PostResponse(deckID string, respStr string) (c *[]Card, err error) {
 
 	data := struct {
 		Responses []struct {

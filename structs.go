@@ -26,7 +26,7 @@ type Carddeck struct {
 	Rating string `json:"rating"`
 }
 
-type Card []struct {
+type Card struct {
 	Text      []string  `json:"text"`
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`

@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
+// Error for when unmarshaling goes wrong
 var ErrJSONUnmarshal = errors.New("json unmarshal")
 
+// All requests will use this method
 func (s *Session) Request(method, urlStr string, data interface{}) (response []byte, err error) {
 
 	var body []byte
@@ -24,6 +26,7 @@ func (s *Session) Request(method, urlStr string, data interface{}) (response []b
 	return s.request(method, urlStr, "application/json", body)
 }
 
+// What goes behind the scenes
 func (s *Session) request(method, urlStr, contentType string, b []byte) (response []byte, err error) {
 
 	req, err := http.NewRequest(method, urlStr, bytes.NewBuffer(b))
@@ -66,6 +69,7 @@ func unmarshal(data []byte, v interface{}) error {
 // Functions specific to Decks
 // ------------------------------------------------------------------------------------------------
 
+// Returns a Carddeck type object
 func (s *Session) GetDeck(deckID string) (cd *Carddeck, err error) {
 
 	body, err := s.Request("GET", EndpointDeck(deckID), nil)
@@ -78,6 +82,7 @@ func (s *Session) GetDeck(deckID string) (cd *Carddeck, err error) {
 
 }
 
+// Returns a Card type object containing all calls (black cards)
 func (s *Session) GetCalls(deckID string) (c *Card, err error) {
 
 	body, err := s.Request("GET", EndpointCalls(deckID), nil)
@@ -90,6 +95,7 @@ func (s *Session) GetCalls(deckID string) (c *Card, err error) {
 
 }
 
+// Returns a Card type object containing all responses (white cards)
 func (s *Session) GetResponses(deckID string) (c *Card, err error) {
 
 	body, err := s.Request("GET", EndpointResponses(deckID), nil)
@@ -102,6 +108,7 @@ func (s *Session) GetResponses(deckID string) (c *Card, err error) {
 
 }
 
+// Posts a call to the deck (You must own the deck)
 func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
 
 	fcallStr := strings.Split(callStr, "_")
@@ -129,6 +136,7 @@ func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
 
 }
 
+// Posts a response to the deck (You must own the deck)
 func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err error) {
 
 	data := struct {
@@ -154,6 +162,7 @@ func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err erro
 
 }
 
+// Deletes a call from the deck (You must own the deck)
 func (s *Session) DeleteCall(deckID string, callID string) (c *Card, err error) {
 
 	body, err := s.Request("DELETE", EndpointCall(deckID, callID), nil)
@@ -166,6 +175,7 @@ func (s *Session) DeleteCall(deckID string, callID string) (c *Card, err error) 
 
 }
 
+// Deletes a response from the deck (You must own the deck)
 func (s *Session) DeleteResponse(deckID string, respID string) (c *Card, err error) {
 
 	body, err := s.Request("DELETE", EndpointResponse(deckID, respID), nil)

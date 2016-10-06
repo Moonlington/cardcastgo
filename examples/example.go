@@ -7,9 +7,11 @@ import (
 )
 
 func main() {
-	cc, err := cardcastgo.New("x-auth-token")
+	cc, err := cardcastgo.New("Token")
 	if err != nil {
 		fmt.Println("error,", err)
 	}
-	fmt.Println(cc.Calls("Deck ID"))
+	fmt.Println(cc.GetDeck("DeckID"))
+	fmt.Println(cc.PostCall("DeckID", "When _ happens, I do _."))
+	fmt.Println(cc.PostResponse("DeckID", "Test"))
 }

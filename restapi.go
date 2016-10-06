@@ -21,7 +21,6 @@ func (s *Session) Request(method, urlStr string, data interface{}) (response []b
 			return
 		}
 	}
-
 	return s.request(method, urlStr, "application/json", body)
 }
 
@@ -54,6 +53,7 @@ func (s *Session) request(method, urlStr, contentType string, b []byte) (respons
 }
 
 func unmarshal(data []byte, v interface{}) error {
+
 	err := json.Unmarshal(data, v)
 	if err != nil {
 		return ErrJSONUnmarshal
@@ -107,14 +107,17 @@ func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
 	fcallStr := strings.Split(callStr, "_")
 
 	data := struct {
-		Calls struct {
+		Calls []struct {
 			Text   []string `json:"text"`
 			String string   `json:"string"`
-		} `json: "calls"`
+		} `json:"calls"`
 	}{}
-
-	data.Calls.Text = fcallStr
-	data.Calls.String = callStr
+	data.Calls = append(data.Calls, struct {
+		Text   []string `json:"text"`
+		String string   `json:"string"`
+	}{})
+	data.Calls[0].Text = fcallStr
+	data.Calls[0].String = callStr
 
 	body, err := s.Request("POST", EndpointCalls(deckID), data)
 	if err != nil {
@@ -129,14 +132,17 @@ func (s *Session) PostCall(deckID string, callStr string) (c *Card, err error) {
 func (s *Session) PostResponse(deckID string, respStr string) (c *Card, err error) {
 
 	data := struct {
-		Responses struct {
+		Responses []struct {
 			Text   []string `json:"text"`
 			String string   `json:"string"`
-		} `json: "responses"`
+		} `json:"responses"`
 	}{}
-
-	data.Responses.Text = append(data.Responses.Text, respStr)
-	data.Responses.String = respStr
+	data.Responses = append(data.Responses, struct {
+		Text   []string `json:"text"`
+		String string   `json:"string"`
+	}{})
+	data.Responses[0].Text = append(data.Responses[0].Text, respStr)
+	data.Responses[0].String = respStr
 
 	body, err := s.Request("POST", EndpointResponses(deckID), data)
 	if err != nil {

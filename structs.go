@@ -27,8 +27,8 @@ type Carddeck struct {
 }
 
 type Card []struct {
-	ID        string    `json:"id"`
 	Text      []string  `json:"text"`
+	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

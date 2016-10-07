@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -35,7 +36,7 @@ func (s *Session) request(method, urlStr, contentType string, b []byte) (respons
 	}
 
 	if s.Token != "" {
-		req.Header.Set("x-auth-token", s.Token)
+		req.Header.Set("X-Auth-Token", s.Token)
 	}
 
 	req.Header.Set("Content-Type", contentType)
@@ -50,6 +51,16 @@ func (s *Session) request(method, urlStr, contentType string, b []byte) (respons
 	response, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return
+	}
+
+	switch resp.StatusCode {
+
+	case http.StatusOK:
+	case http.StatusCreated:
+	case http.StatusNoContent:
+
+	default: // Error condition
+		err = fmt.Errorf("HTTP %s, %s", resp.Status, response)
 	}
 
 	return
@@ -113,18 +124,19 @@ func (s *Session) PostCall(deckID string, callStr string) (c *[]Card, err error)
 
 	fcallStr := strings.Split(callStr, "_")
 
-	data := struct {
-		Calls []struct {
-			Text   []string `json:"text"`
-			String string   `json:"string"`
-		} `json:"calls"`
-	}{}
-	data.Calls = append(data.Calls, struct {
+	type Call struct {
 		Text   []string `json:"text"`
 		String string   `json:"string"`
-	}{})
-	data.Calls[0].Text = fcallStr
-	data.Calls[0].String = callStr
+	}
+
+	type Envelope struct {
+		Calls []Call `json:"calls"`
+	}
+
+	data := Envelope{
+		Calls: []Call{
+			Call{Text: fcallStr, String: callStr},
+		}}
 
 	body, err := s.Request("POST", EndpointCalls(deckID), data)
 	if err != nil {
@@ -139,18 +151,19 @@ func (s *Session) PostCall(deckID string, callStr string) (c *[]Card, err error)
 // Posts a response to the deck (You must own the deck)
 func (s *Session) PostResponse(deckID string, respStr string) (c *[]Card, err error) {
 
-	data := struct {
-		Responses []struct {
-			Text   []string `json:"text"`
-			String string   `json:"string"`
-		} `json:"responses"`
-	}{}
-	data.Responses = append(data.Responses, struct {
+	type Response struct {
 		Text   []string `json:"text"`
 		String string   `json:"string"`
-	}{})
-	data.Responses[0].Text = append(data.Responses[0].Text, respStr)
-	data.Responses[0].String = respStr
+	}
+
+	type Envelope struct {
+		Responses []Response `json:"responses"`
+	}
+
+	data := Envelope{
+		Responses: []Response{
+			Response{Text: []string{respStr}, String: respStr},
+		}}
 
 	body, err := s.Request("POST", EndpointResponses(deckID), data)
 	if err != nil {

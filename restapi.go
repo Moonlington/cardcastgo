@@ -200,3 +200,39 @@ func (s *Session) DeleteResponse(deckID string, respID string) (c *Card, err err
 	return
 
 }
+
+// Edits a call from a deck (You must own the deck)
+func (s *Session) EditCall(deckID string, callID string, callStr string) (c *Card, err error) {
+
+	fcallStr := strings.Split(callStr, "_")
+
+	data := struct {
+		Text []string `json:"text"`
+	}{fcallStr}
+
+	body, err := s.Request("PUT", EndpointCall(deckID, callID), data)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}
+
+// Edits a response from a deck (You must own the deck)
+func (s *Session) EditResponse(deckID string, respID string, respStr string) (c *Card, err error) {
+
+	data := struct {
+		Text []string `json:"text"`
+	}{[]string{respStr}}
+
+	body, err := s.Request("PUT", EndpointResponse(deckID, respID), data)
+	if err != nil {
+		return
+	}
+
+	err = unmarshal(body, &c)
+	return
+
+}
